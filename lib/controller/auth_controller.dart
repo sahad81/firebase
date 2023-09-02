@@ -1,16 +1,19 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:firebase_/helper/date_converter.dart';
+import 'package:firebase_/screens/home_screen.dart';
+import 'package:firebase_/screens/register.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_/helper/route_helper.dart';
 import 'package:firebase_/model/register_model.dart';
 import 'package:firebase_/screens/base/custom_snackbar.dart';
 import 'package:firebase_/screens/verifiaction_screen.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,6 +21,8 @@ class AuthController extends GetxController implements GetxService {
   String? _number = '';
   bool _loadingInLogin = false;
   bool get loginInLogin => _loadingInLogin;
+  bool _socialLogin = false;
+  bool get socialLogin => _socialLogin;
   String? _country_code;
   String? get contry_code => _country_code;
   String? get number => _number;
@@ -64,7 +69,9 @@ class AuthController extends GetxController implements GetxService {
       _verificationId = verId;
       _loadingInLogin = false;
       update();
-      Get.to(const VerificationScreen());
+      Get.to(VerificationScreen(
+        Phone: phone,
+      ));
     }
 
 // ignore: non_constant_identifier_names
@@ -81,6 +88,70 @@ class AuthController extends GetxController implements GetxService {
         verificationFailed: verificationFaild,
         codeSent: sentcode,
         codeAutoRetrievalTimeout: PhonecodeAUthRetraiveltimeout);
+  }
+
+  Future<void> signInWithGoogle() async {
+    _loadingInLogin = true;
+    update();
+    try {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      if (googleUser == null) {
+        log('The user canceled the Google sign-in');
+        _loadingInLogin = false;
+        update();
+        return;
+      }
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser.authentication;
+
+      // Create a new credential
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+
+      // Sign in with the credential
+      final UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // Get the user's UID
+      _uid = userCredential.user?.uid ?? "";
+
+      // Check if the user is new or existing
+      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+        // This means the user is a new user
+        log("New user signed in with UID: $_uid");
+        final String userName = googleUser.displayName ?? "";
+        // Get the user's profile image URL
+        final String photoUrl = googleUser.photoUrl ?? "";
+        storeData(RegisterModel(
+            bio: '',
+            createdAt: DateConverter.dateToDateAndTime(DateTime.now()),
+            email: googleUser.email,
+            image: photoUrl,
+            name: userName,
+            phone: '',
+            uid: _uid));
+        Get.offAll(HomeScreen());
+      } else {
+        // This means the user is an existing user
+        log("Existing user signed in with UID: $_uid");
+        SharedPreferences s = await SharedPreferences.getInstance();
+        s.setBool('signed', true);
+        Get.offAll(HomeScreen());
+      }
+      _loadingInLogin = false;
+      update();
+    } catch (e) {
+      // Handle any errors that occurred during the sign-in process
+      _loadingInLogin = false;
+      update();
+      log("Error signing in with Google: $e");
+    }
   }
 
   verifyOtp() async {
@@ -147,9 +218,8 @@ class AuthController extends GetxController implements GetxService {
           .then((value) async {
         SharedPreferences s = await SharedPreferences.getInstance();
 
-        s
-            .setString('user_model', jsonEncode(registerModel.tojson()))
-            .then((value) async {});
+        s.setBool('signed', true);
+        Get.off(HomeScreen());
       });
       _loadingInLogin = false;
       update();
@@ -171,6 +241,7 @@ class AuthController extends GetxController implements GetxService {
           await ImagePicker().pickImage(source: ImageSource.gallery);
       if (pickedImage != null) {
         _imagepath = File(pickedImage.path);
+        log(_imagepath.toString());
         update();
       }
     } catch (e) {

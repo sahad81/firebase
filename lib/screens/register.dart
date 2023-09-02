@@ -1,6 +1,6 @@
-import 'dart:io';
 
 import 'package:firebase_/controller/auth_controller.dart';
+import 'package:firebase_/helper/date_converter.dart';
 import 'package:firebase_/model/register_model.dart';
 import 'package:firebase_/screens/base/custom_button.dart';
 import 'package:firebase_/screens/base/custom_snackbar.dart';
@@ -9,7 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/routes/circular_reveal_clipper.dart';
-
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 class RegisterScreen extends StatefulWidget {
   RegisterScreen({super.key});
 
@@ -86,7 +86,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ? CircularProgressIndicator()
                     : CustomButton(
                         buttonText: 'Register',
-                        onPressed: () {
+                        onPressed: () async {
                           final _bio = bioController.text.trim();
                           final _name = nameController.text.trim();
                           final _email = emailController.text.trim();
@@ -99,21 +99,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             showCustomSnackBar('Enter Bio');
                           } else {
                             c.storeData(RegisterModel(
-                                bio: _bio,
-                                createdAt: DateTime.now()
-                                    .microsecondsSinceEpoch
-                                    .toString(),
-                                email: _email,
-                                name: _name,
-                                phone: FirebaseAuth
-                                    .instance.currentUser!.phoneNumber,
-                                image: c.imagePath != null
-                                    ? c
-                                        .storefiletofirestore(
-                                            'profilepic${c.uid}', c.imagePath!)
-                                        .toString()
-                                    : '',
-                                uid: FirebaseAuth.instance.currentUser!.uid));
+                              bio: _bio,
+                              createdAt: DateConverter.dateToDateAndTime(
+                                  DateTime.now()),
+                              email: _email,
+                              name: _name,
+                              phone: FirebaseAuth
+                                  .instance.currentUser!.phoneNumber,
+                              // Use `await` to wait for the image URL to be fetched
+                              image: c.imagePath != null
+                                  ? await c.storefiletofirestore(
+                                      'profilepic${c.uid}', c.imagePath!)
+                                  : '',
+                              uid: FirebaseAuth.instance.currentUser!.uid,
+                            ));
                           }
                         },
                       )

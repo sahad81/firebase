@@ -1,4 +1,5 @@
 import 'package:firebase_/screens/spalsh_screen.dart';
+import 'package:firebase_/util/app_constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -29,12 +30,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Flutter Demo',
+    
+      title:AppConstants.appame,
        getPages: RouteHelper.routes,
          debugShowCheckedModeBanner: false,
       theme: ThemeData(
-     
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade900),
         useMaterial3: true,
       ),
       home:SplashScreen()   );

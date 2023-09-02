@@ -1,5 +1,5 @@
 
 class AppConstants {
-static const String appame='Hello';
+static const String appame='HAPPOP';
 
 }

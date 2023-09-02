@@ -1,5 +1,3 @@
-import 'dart:io';
-
 class RegisterModel {
   String? _email;
   String? _uid;
@@ -10,31 +8,28 @@ class RegisterModel {
   String? _phone;
 
   RegisterModel(
-      {  
-        String? email,
-  String? uid,
-  String? image,
-  String? bio,
-  String? name,
-  String? createdAt,
-  String? phone
-      }){
-  this._bio = bio;
+      {String? email,
+      String? uid,
+      String? image,
+      String? bio,
+      String? name,
+      String? createdAt,
+      String? phone}) {
+    this._bio = bio;
     this._createdAt = createdAt;
     this._email = email;
     this._image = image;
     this._uid = uid;
-    this._name=name;
-    this._phone=phone;
-   
-      }
-        String? get  bio => _bio;
+    this._name = name;
+    this._phone = phone;
+  }
+  String? get bio => _bio;
   String? get createdAt => _createdAt;
   String? get email => _email;
   String? get image => _image;
   String? get uid => _uid;
-  String? get name =>_name;
-   String? get phone=>_phone;
+  String? get name => _name;
+  String? get phone => _phone;
 
   RegisterModel.fromJson(Map<String, dynamic> json) {
     _bio = json['bio'];
@@ -43,16 +38,17 @@ class RegisterModel {
     _uid = json['uid'];
     _createdAt = json['createdAt'];
     _image = json['image'];
-    _phone=json['phone'];
+    _phone = json['phone'];
   }
   Map<String, dynamic> tojson() {
-    final Map<String, dynamic> data =  Map<String, dynamic>();
-  data['bio']=_bio;
-  data['email']= _email;
-  data['image']=_image;
-  data['uid']= _uid;
-  data['createdAt']=_createdAt;
-  data['phone']=_phone;
-  return data;
+    final Map<String, dynamic> data = Map<String, dynamic>();
+    data['bio'] = _bio;
+    data['email'] = _email;
+    data['image'] = _image;
+    data['uid'] = _uid;
+    data['createdAt'] = _createdAt;
+    data['phone'] = _phone;
+     data['name'] = _name;
+    return data;
   }
 }
