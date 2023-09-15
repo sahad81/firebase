@@ -51,7 +51,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       : null,
                   child: !authController.loginInLogin
                       ? Column(
+                        
                           children: [
+                        SizedBox(height: Dimensions.PADDING_SIZE_EXTRA_LARGE,),
                             Center(
                                 child: Text(
                               AppConstants.appame,
@@ -61,6 +63,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                   letterSpacing: 5),
                             )),
                             SizedBox(
+                              height: MediaQuery.sizeOf(context).height * 0.04,
+                            ),
+
+
+
+                           Text('SIGN IN',style: robotoBold.copyWith(fontSize: Dimensions.fontSizeOverLarge),),
+                                 SizedBox(
                               height: MediaQuery.sizeOf(context).height * 0.04,
                             ),
                             Row(

@@ -10,6 +10,7 @@ import 'package:firebase_/helper/route_helper.dart';
 import 'package:firebase_/model/register_model.dart';
 import 'package:firebase_/screens/base/custom_snackbar.dart';
 import 'package:firebase_/screens/verifiaction_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -36,6 +37,14 @@ class AuthController extends GetxController implements GetxService {
   String get verificationCode => _verificationCode;
   final FirebaseStorage firStore = FirebaseStorage.instance;
   final FirebaseAuth fireauth = FirebaseAuth.instance;
+
+  void logOut(BuildContext context) async {
+    SharedPreferences s = await SharedPreferences.getInstance();
+   fireauth.signOut();
+    s.clear();
+    Get.offAllNamed(RouteHelper.splash);
+   
+  }
 
   void updateVerificationCode(String query) {
     _verificationCode = query;
@@ -136,13 +145,13 @@ class AuthController extends GetxController implements GetxService {
             name: userName,
             phone: '',
             uid: _uid));
-        Get.offAll(HomeScreen());
+        Get.offAllNamed(RouteHelper.dashboardScreen);
       } else {
         // This means the user is an existing user
         log("Existing user signed in with UID: $_uid");
         SharedPreferences s = await SharedPreferences.getInstance();
         s.setBool('signed', true);
-        Get.offAll(HomeScreen());
+        Get.offAllNamed(RouteHelper.dashboardScreen);
       }
       _loadingInLogin = false;
       update();
@@ -193,7 +202,7 @@ class AuthController extends GetxController implements GetxService {
         SharedPreferences s = await SharedPreferences.getInstance();
         s.setBool('signed', true);
         Get.toNamed(RouteHelper.homescreen);
-        Get.offAllNamed(RouteHelper.gethomescreen());
+        Get.offAllNamed(RouteHelper.dashboardScreen);
       } else {
         log('new ');
         Get.offAllNamed(RouteHelper.register);
@@ -219,7 +228,7 @@ class AuthController extends GetxController implements GetxService {
         SharedPreferences s = await SharedPreferences.getInstance();
 
         s.setBool('signed', true);
-        Get.off(HomeScreen());
+        Get.offAllNamed(RouteHelper.dashboardScreen);
       });
       _loadingInLogin = false;
       update();

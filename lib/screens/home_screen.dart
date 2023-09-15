@@ -10,12 +10,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
-   
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: SafeArea(
           child: Scrollbar(
               child: SingleChildScrollView(
